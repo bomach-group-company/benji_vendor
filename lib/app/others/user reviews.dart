@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../../reusable widgets/my appbar.dart';
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/providers/constants.dart';
 import '../../theme/colors.dart';
-import '../../providers/constants.dart';
 
 class UserReviews extends StatefulWidget {
   const UserReviews({super.key});
@@ -51,8 +51,7 @@ class _UserReviewsState extends State<UserReviews> {
     return Scaffold(
       appBar: MyAppBar(
         backgroundColor: kPrimaryColor,
-                  toolbarHeight: 80,
-
+        toolbarHeight: 80,
         title: "Reviews",
         actions: const [],
         elevation: 0.0,

@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 
-import '../../providers/constants.dart';
-import '../../reusable widgets/showModalBottomSheet.dart';
-import '../../reusable widgets/showModalBottomSheetTitleWithIcon.dart';
+import '../../src/common_widgets/category button section.dart';
+import '../../src/common_widgets/showModalBottomSheet.dart';
+import '../../src/common_widgets/showModalBottomSheetTitleWithIcon.dart';
+import '../../src/providers/constants.dart';
 import '../../theme/colors.dart';
-import '../../widgets/product/category button section.dart';
 
 class ViewProduct extends StatefulWidget {
   const ViewProduct({super.key});

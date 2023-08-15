@@ -1,12 +1,13 @@
 // ignore_for_file: avoid_unnecessary_containers
 
-import 'package:benji_vendor/theme/colors.dart';
+import 'package:benji_vendor/app/others/user%20reviews.dart';
 import 'package:flutter/material.dart';
 
-import '../../providers/constants.dart';
-import '../../widgets/home/home appBar vendor name.dart';
-import '../../widgets/home/home orders container.dart';
-import '../../widgets/home/home showModalBottomSheet.dart';
+import '../../src/common_widgets/home appBar vendor name.dart';
+import '../../src/common_widgets/home orders container.dart';
+import '../../src/common_widgets/home showModalBottomSheet.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
 import '../others/notifications.dart';
 import '../product/add new product.dart';
 import '../profile/profile.dart';
@@ -326,7 +327,13 @@ class _DashboardState extends State<Dashboard> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const UserReviews(),
+                            ),
+                          );
+                        },
                         child: Text(
                           'See All Reviews',
                           style: TextStyle(

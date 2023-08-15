@@ -1,11 +1,11 @@
 import 'package:benji_vendor/app/product/view%20product.dart';
 import 'package:flutter/material.dart';
 
-import '../../providers/constants.dart';
-import '../../reusable widgets/my outlined elevatedButton.dart';
-import '../../reusable widgets/search field.dart';
+import '../../src/common_widgets/category button section.dart';
+import '../../src/common_widgets/my outlined elevatedButton.dart';
+import '../../src/common_widgets/search field.dart';
+import '../../src/providers/constants.dart';
 import '../../theme/colors.dart';
-import '../../widgets/product/category button section.dart';
 import 'add new product.dart';
 
 class Product extends StatefulWidget {

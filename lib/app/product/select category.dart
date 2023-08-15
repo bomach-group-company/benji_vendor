@@ -1,13 +1,13 @@
 // ignore_for_file: file_names
 
-import 'package:benji_vendor/reusable%20widgets/my%20appbar.dart';
-import 'package:benji_vendor/theme/colors.dart';
 import 'package:flutter/material.dart';
 
-import '../../providers/constants.dart';
-import '../../reusable widgets/my elevatedButton.dart';
-import '../../reusable widgets/my textformfield2.dart';
-import '../../reusable widgets/showModalBottomSheetTitleWithIcon.dart';
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my textformfield2.dart';
+import '../../src/common_widgets/showModalBottomSheetTitleWithIcon.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
 import '../others/successful_screen.dart';
 
 class SelectCategory extends StatefulWidget {

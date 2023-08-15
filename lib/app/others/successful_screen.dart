@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-import '../../providers/constants.dart';
-import '../../reusable widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/providers/constants.dart';
 
 class SuccessfulScreen extends StatelessWidget {
   final String text;

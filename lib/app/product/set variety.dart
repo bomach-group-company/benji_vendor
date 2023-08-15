@@ -2,13 +2,12 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:benji_vendor/providers/constants.dart';
-import 'package:benji_vendor/reusable%20widgets/my%20outlined%20elevatedButton.dart';
-import 'package:benji_vendor/theme/colors.dart';
-
-import '../../reusable widgets/my appbar.dart';
-import '../../reusable widgets/my elevatedButton.dart';
-import '../../reusable widgets/my textformfield2.dart';
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my outlined elevatedButton.dart';
+import '../../src/common_widgets/my textformfield2.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
 
 class SetVariety extends StatefulWidget {
   const SetVariety({super.key});
