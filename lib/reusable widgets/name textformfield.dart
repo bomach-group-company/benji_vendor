@@ -11,6 +11,7 @@ class NameTextFormField extends StatelessWidget {
   final TextInputAction textInputAction;
   final FocusNode nameFocusNode;
   final String hintText;
+  final TextInputType? type;
 
   const NameTextFormField({
     super.key,
@@ -20,6 +21,7 @@ class NameTextFormField extends StatelessWidget {
     required this.textInputAction,
     required this.nameFocusNode,
     required this.hintText,
+    this.type
   });
 
   @override
@@ -35,7 +37,7 @@ class NameTextFormField extends StatelessWidget {
       cursorColor: kSecondaryColor,
       autocorrect: true,
       enableSuggestions: true,
-      keyboardType: TextInputType.name,
+      keyboardType : type ??  TextInputType.name,
       maxLines: 1,
       style: TextStyle(
         color: kSecondaryColor,

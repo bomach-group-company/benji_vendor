@@ -1,6 +1,12 @@
+import 'package:benji_vendor/back_office/order/order_controller.dart';
+import 'package:benji_vendor/back_office/ratings/rating_controller.dart';
 import 'package:benji_vendor/theme/colors.dart';
+import 'package:benji_vendor/utility/operations.dart';
 import 'package:flutter/material.dart';
 
+import '../back_office/category/category_controller.dart';
+import '../back_office/my_product/my_product_controller.dart';
+import '../back_office/notification/notification_controller.dart';
 import 'dashboard/dashboard.dart';
 import 'orders/orders.dart';
 import 'product/product.dart';
@@ -95,5 +101,13 @@ class _OverViewState extends State<OverView> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Operations.readAll(context);
+    });
   }
 }

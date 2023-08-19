@@ -1,10 +1,15 @@
 import 'package:benji_vendor/app/product/view%20product.dart';
+import 'package:benji_vendor/back_office/my_product/my_product_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/my_product/my_product_model.dart';
 import '../../providers/constants.dart';
 import '../../reusable widgets/my outlined elevatedButton.dart';
 import '../../reusable widgets/search field.dart';
 import '../../theme/colors.dart';
+import '../../utility/operations.dart';
 import '../../widgets/product/category button section.dart';
 import 'add new product.dart';
 
@@ -63,6 +68,7 @@ class _ProductState extends State<Product> {
 
   @override
   Widget build(BuildContext context) {
+    MyProductProvider stream = context.watch();
     return GestureDetector(
       onTap: (() => FocusManager.instance.primaryFocus?.unfocus()),
       child: Scaffold(
@@ -74,227 +80,280 @@ class _ProductState extends State<Product> {
             padding: const EdgeInsets.all(
               kDefaultPadding,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: StreamBuilder(
+                stream: null,
+                builder: (context, snapshot) {
+                  List<MyProductsModel> searchFor = stream.myProd
+                      .where((element) => element.name!
+                          .toLowerCase()
+                          .contains(searchController.text.toLowerCase()))
+                      .toList();
+                  List<MyProductsModel> afterFilter = searchFor
+                      .where((element) => element.subCategoryId!.name!.contains(
+                          stream.selectedItemCat == "All"
+                              ? ""
+                              : stream.selectedItemCat))
+                      .toList();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Product',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Product',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            MyOutlinedElevatedButton(
+                              elevation: 5.0,
+                              onPressed: () {
+                                Operations.clearAddProductProvider(context);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => const AddProduct(
+                                      isEdit: false,
+                                    ),
+                                  ),
+                                );
+                              },
+                              circularBorderRadius: 10,
+                              minimumSizeWidth: 65,
+                              minimumSizeHeight: 35,
+                              maximumSizeWidth: 65,
+                              maximumSizeHeight: 35,
+                              buttonTitle: "+ Add",
+                              titleFontSize: 12,
+                            )
+                          ],
                         ),
                       ),
-                      MyOutlinedElevatedButton(
-                        elevation: 5.0,
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const AddProduct(),
-                            ),
-                          );
+                      kSizedBox,
+                      SearchField(
+                        hintText: "Search your products",
+                        searchController: searchController,
+                        change: (val) {
+                          setState(() {});
                         },
-                        circularBorderRadius: 10,
-                        minimumSizeWidth: 65,
-                        minimumSizeHeight: 35,
-                        maximumSizeWidth: 65,
-                        maximumSizeHeight: 35,
-                        buttonTitle: "+ Add",
-                        titleFontSize: 12,
+                      ),
+                      kSizedBox,
+                      CategoryButtonSection(
+                        category: stream.myShopCat,
+                        categorybgColor: _categoryButtonBgColor,
+                        categoryFontColor: _categoryButtonFontColor,
+                        isOrder: false,
+                      ),
+                      kHalfSizedBox,
+                      Text(
+                        'Total ${stream.myProd.length} items',
+                        style: const TextStyle(
+                          color: Color(
+                            0xFF9B9BA5,
+                          ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      kSizedBox,
+                      Flexible(
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          itemCount: afterFilter.length,
+                          itemBuilder: (context, index) {
+                            final MyProductsModel data = afterFilter[index];
+                            return InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewProduct(
+                                      product: data,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: SizedBox(
+                                height: 120,
+                                width: MediaQuery.of(context).size.width,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 104,
+                                      height: 104,
+                                      decoration: ShapeDecoration(
+                                        // image: const DecorationImage(
+                                        //   image: AssetImage(
+                                        //     "assets/images/food/pasta.png",
+                                        //   ),
+                                        //   fit: BoxFit.fill,
+                                        // ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                      child: CachedNetworkImage(
+                                        imageUrl: data.productImage ?? "",
+                                        fit: BoxFit.cover,
+                                        progressIndicatorBuilder: (context, url,
+                                                downloadProgress) =>
+                                            const Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                          color: kRedColor,
+                                        )),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(
+                                          Icons.error,
+                                          color: kRedColor,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: SizedBox(
+                                        width: 200,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              data.name ?? "",
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              style: const TextStyle(
+                                                overflow: TextOverflow.ellipsis,
+                                                color: Color(
+                                                  0xFF32343E,
+                                                ),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            Text(
+                                              data.description ?? "",
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      const TextSpan(
+                                                        text: '₦',
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                            0xFF4F4F4F,
+                                                          ),
+                                                          fontSize: 14,
+                                                          fontFamily: 'Sen',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                      const TextSpan(
+                                                        text: ' ',
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                            0xFF4F4F4F,
+                                                          ),
+                                                          fontSize: 13.60,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: Operations
+                                                            .convertToCurrency(
+                                                                data.price
+                                                                    .toString()),
+                                                        style: const TextStyle(
+                                                          color: Color(
+                                                            0xFF4F4F4F,
+                                                          ),
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      const TextSpan(
+                                                        text: 'Qty:',
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                            0xFF4F4F4F,
+                                                          ),
+                                                          fontSize: 13.60,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                      const TextSpan(
+                                                        text: ' ',
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                            0xFF4F4F4F,
+                                                          ),
+                                                          fontSize: 13.60,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: data
+                                                            .quantityAvailable
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                          color: Color(
+                                                            0xFF4F4F4F,
+                                                          ),
+                                                          fontSize: 13.60,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       )
                     ],
-                  ),
-                ),
-                kSizedBox,
-                SearchField(
-                  hintText: "Search your products",
-                  searchController: searchController,
-                ),
-                kSizedBox,
-                CategoryButtonSection(
-                  category: _categoryButton,
-                  categorybgColor: _categoryButtonBgColor,
-                  categoryFontColor: _categoryButtonFontColor,
-                ),
-                kHalfSizedBox,
-                const Text(
-                  'Total 3 items',
-                  style: TextStyle(
-                    color: Color(
-                      0xFF9B9BA5,
-                    ),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                kSizedBox,
-                Flexible(
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemCount: 3,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const ViewProduct(),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: 120,
-                          width: MediaQuery.of(context).size.width,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 104,
-                                height: 104,
-                                decoration: ShapeDecoration(
-                                  image: const DecorationImage(
-                                    image: AssetImage(
-                                      "assets/images/food/pasta.png",
-                                    ),
-                                    fit: BoxFit.fill,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: 200,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Smokey Jollof Rice',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          color: Color(
-                                            0xFF32343E,
-                                          ),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                      Text(
-                                        "Freshly steamed Jollof Rice",
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
-                                          overflow: TextOverflow.fade,
-                                        ),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: '₦',
-                                                  style: TextStyle(
-                                                    color: Color(
-                                                      0xFF4F4F4F,
-                                                    ),
-                                                    fontSize: 14,
-                                                    fontFamily: 'Sen',
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: ' ',
-                                                  style: TextStyle(
-                                                    color: Color(
-                                                      0xFF4F4F4F,
-                                                    ),
-                                                    fontSize: 13.60,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '850',
-                                                  style: TextStyle(
-                                                    color: Color(
-                                                      0xFF4F4F4F,
-                                                    ),
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: 'Qty:',
-                                                  style: TextStyle(
-                                                    color: Color(
-                                                      0xFF4F4F4F,
-                                                    ),
-                                                    fontSize: 13.60,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: ' ',
-                                                  style: TextStyle(
-                                                    color: Color(
-                                                      0xFF4F4F4F,
-                                                    ),
-                                                    fontSize: 13.60,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '3200',
-                                                  style: TextStyle(
-                                                    color: Color(
-                                                      0xFF4F4F4F,
-                                                    ),
-                                                    fontSize: 13.60,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+                  );
+                }),
           ),
         ),
       ),

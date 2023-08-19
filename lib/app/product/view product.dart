@@ -1,15 +1,29 @@
 // ignore_for_file: file_names
 
+import 'package:benji_vendor/back_office/my_product/my_product_provider.dart';
+import 'package:benji_vendor/back_office/networks/error.dart';
+import 'package:benji_vendor/back_office/upload_product/upload_prod_provider.dart';
+import 'package:benji_vendor/reusable%20widgets/loader.dart';
+import 'package:benji_vendor/utility/allNavigation.dart';
+import 'package:benji_vendor/utility/operations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/category/category_provider.dart';
+import '../../back_office/my_product/my_product_controller.dart';
+import '../../back_office/my_product/my_product_model.dart';
+import '../../back_office/upload_product/upload_prod_controller.dart';
 import '../../providers/constants.dart';
 import '../../reusable widgets/showModalBottomSheet.dart';
 import '../../reusable widgets/showModalBottomSheetTitleWithIcon.dart';
 import '../../theme/colors.dart';
 import '../../widgets/product/category button section.dart';
+import 'add new product.dart';
 
 class ViewProduct extends StatefulWidget {
-  const ViewProduct({super.key});
+  final MyProductsModel product;
+  const ViewProduct({super.key, required this.product});
 
   @override
   State<ViewProduct> createState() => _ViewProductState();
@@ -60,6 +74,8 @@ class _ViewProductState extends State<ViewProduct> {
 
   @override
   Widget build(BuildContext context) {
+    SendProductProvider stream = context.watch<SendProductProvider>();
+    MyProductProvider variety = context.watch<MyProductProvider>();
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
@@ -78,11 +94,24 @@ class _ViewProductState extends State<ViewProduct> {
               height: 320,
               decoration: const ShapeDecoration(
                 shape: RoundedRectangleBorder(),
-                image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: AssetImage(
-                    "assets/images/food/pasta.png",
-                  ),
+                // image: DecorationImage(
+                //   fit: BoxFit.fill,
+                //   image: AssetImage(
+                //     "assets/images/food/pasta.png",
+                //   ),
+                // ),
+              ),
+              child: CachedNetworkImage(
+                imageUrl: widget.product.productImage ?? "",
+                fit: BoxFit.cover,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const Center(
+                        child: CircularProgressIndicator(
+                  color: kRedColor,
+                )),
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.error,
+                  color: kRedColor,
                 ),
               ),
             ),
@@ -143,7 +172,29 @@ class _ViewProductState extends State<ViewProduct> {
                                 height: kDefaultPadding * 3,
                               ),
                               ListTile(
-                                onTap: () {},
+                                onTap: () async {
+                                  Operations.clearAddProductProvider(context);
+                                  CategoryProvider action =
+                                      Provider.of<CategoryProvider>(context,
+                                          listen: false);
+                                  try {
+                                    action.addSubCat(
+                                        "${widget.product.subCategoryId!.name!}|${widget.product.subCategoryId!.id!}");
+
+                                    action.addCategory(
+                                        "${widget.product.subCategoryId!.category!.name!}|${widget.product.subCategoryId!.category!.id!}");
+                                  } catch (e) {
+                                    seeError(e);
+                                  }
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => AddProduct(
+                                        isEdit: true,
+                                        data: widget.product,
+                                      ),
+                                    ),
+                                  );
+                                },
                                 leading: Icon(
                                   Icons.edit,
                                   color: kAccentColor,
@@ -159,23 +210,31 @@ class _ViewProductState extends State<ViewProduct> {
                                   ),
                                 ),
                               ),
-                              ListTile(
-                                onTap: () {},
-                                leading: Icon(
-                                  Icons.delete,
-                                  color: kAccentColor,
-                                  size: 14,
-                                ),
-                                title: const Text(
-                                  'Delete',
-                                  style: TextStyle(
-                                    color: Color(0xFF696969),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.32,
-                                  ),
-                                ),
-                              ),
+                              stream.loadPack
+                                  ? Loader()
+                                  : ListTile(
+                                      onTap: () async {
+                                        await UploadProductController.delProd(
+                                            context,
+                                            widget.product.id!.toString());
+                                        // ignore: use_build_context_synchronously
+                                        PageRouting.popToPage(context);
+                                      },
+                                      leading: Icon(
+                                        Icons.delete,
+                                        color: kAccentColor,
+                                        size: 14,
+                                      ),
+                                      title: const Text(
+                                        'Delete',
+                                        style: TextStyle(
+                                          color: Color(0xFF696969),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: -0.32,
+                                        ),
+                                      ),
+                                    ),
                             ],
                           ),
                         ),
@@ -220,13 +279,13 @@ class _ViewProductState extends State<ViewProduct> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Smokey Jollof Rice",
+                          widget.product.name ?? "",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(
                               0xFF302F3C,
                             ),
@@ -235,8 +294,8 @@ class _ViewProductState extends State<ViewProduct> {
                           ),
                         ),
                         Text(
-                          "₦850",
-                          style: TextStyle(
+                          "₦${Operations.convertToCurrency(widget.product.price.toString())}",
+                          style: const TextStyle(
                             color: Color(
                               0xFF333333,
                             ),
@@ -248,9 +307,9 @@ class _ViewProductState extends State<ViewProduct> {
                       ],
                     ),
                     kSizedBox,
-                    const Text(
-                      "This is a short description about the food you mentoned which is a restaurant food in this case.",
-                      style: TextStyle(
+                    Text(
+                      widget.product.description ?? "",
+                      style: const TextStyle(
                         color: Color(
                           0xFF676565,
                         ),
@@ -259,13 +318,13 @@ class _ViewProductState extends State<ViewProduct> {
                       ),
                     ),
                     kSizedBox,
-                    const SizedBox(
+                    SizedBox(
                       width: 67,
                       height: 17,
                       child: Text(
-                        'Qty: 3200',
+                        'Qty: ${widget.product.quantityAvailable!.toString()}',
                         textAlign: TextAlign.right,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(
                             0xFF828282,
                           ),
@@ -275,50 +334,51 @@ class _ViewProductState extends State<ViewProduct> {
                       ),
                     ),
                     kSizedBox,
-                    CategoryButtonSection(
-                      category: _categoryButtonText,
-                      categorybgColor: _categoryButtonBgColor,
-                      categoryFontColor: _categoryButtonFontColor,
-                    ),
+                    // CategoryButtonSection(
+                    //   category: _categoryButtonText,
+                    //   categorybgColor: _categoryButtonBgColor,
+                    //   categoryFontColor: _categoryButtonFontColor,
+                    //   isOrder: false,
+                    // ),
                     kSizedBox,
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Beef (₦2,000)',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontFamily: 'Sen',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        kSizedBox,
-                        Text(
-                          'Fish (₦2,000)',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontFamily: 'Sen',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        kSizedBox,
-                        Text(
-                          'Goat Meat (₦2,000)',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontFamily: 'Sen',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        kSizedBox,
-                      ],
-                    )
+                    // const Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Text(
+                    //       'Beef (₦2,000)',
+                    //       textAlign: TextAlign.center,
+                    //       style: TextStyle(
+                    //         color: Colors.black,
+                    //         fontSize: 14,
+                    //         fontFamily: 'Sen',
+                    //         fontWeight: FontWeight.w400,
+                    //       ),
+                    //     ),
+                    //     kSizedBox,
+                    //     Text(
+                    //       'Fish (₦2,000)',
+                    //       textAlign: TextAlign.center,
+                    //       style: TextStyle(
+                    //         color: Colors.black,
+                    //         fontSize: 14,
+                    //         fontFamily: 'Sen',
+                    //         fontWeight: FontWeight.w400,
+                    //       ),
+                    //     ),
+                    //     kSizedBox,
+                    //     Text(
+                    //       'Goat Meat (₦2,000)',
+                    //       textAlign: TextAlign.center,
+                    //       style: TextStyle(
+                    //         color: Colors.black,
+                    //         fontSize: 14,
+                    //         fontFamily: 'Sen',
+                    //         fontWeight: FontWeight.w400,
+                    //       ),
+                    //     ),
+                    //     kSizedBox,
+                    //   ],
+                    // )
                   ],
                 ),
               ),
@@ -327,5 +387,13 @@ class _ViewProductState extends State<ViewProduct> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      MyProductController.myVariety(context, widget.product.id);
+    });
   }
 }

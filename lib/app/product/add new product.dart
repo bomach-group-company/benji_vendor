@@ -1,19 +1,36 @@
 // ignore_for_file: file_names, prefer_typing_uninitialized_variables
 
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
+import 'package:benji_vendor/back_office/category/category_provider.dart';
+import 'package:benji_vendor/back_office/networks/error.dart';
+import 'package:benji_vendor/back_office/upload_product/upload_prod_controller.dart';
+import 'package:benji_vendor/back_office/upload_product/upload_prod_provider.dart';
+import 'package:benji_vendor/reusable%20widgets/toast.dart';
+import 'package:benji_vendor/utility/allNavigation.dart';
+import 'package:benji_vendor/utility/operations.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../back_office/my_product/my_product_model.dart';
 import '../../providers/constants.dart';
+import '../../reusable widgets/loader.dart';
 import '../../reusable widgets/my appbar.dart';
 import '../../reusable widgets/my disabled outlined elevatedButton.dart';
 import '../../reusable widgets/my elevatedButton.dart';
+import '../../reusable widgets/my fixed snackBar.dart';
 import '../../reusable widgets/my outlined elevatedButton.dart';
 import '../../reusable widgets/my textformfield.dart';
 import '../../theme/colors.dart';
+import '../../utility/extras_provider.dart';
 import 'select category.dart';
 import 'set variety.dart';
 
 class AddProduct extends StatefulWidget {
-  const AddProduct({super.key});
+  final bool? isEdit;
+  final MyProductsModel? data;
+
+  const AddProduct({super.key, required this.isEdit, this.data});
 
   @override
   State<AddProduct> createState() => _AddProductState();
@@ -63,17 +80,56 @@ class _AddProductState extends State<AddProduct> {
   @override
   void initState() {
     super.initState();
+
     isToggled = true;
+    if (widget.isEdit == true) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        CategoryProvider action =
+            Provider.of<CategoryProvider>(context, listen: false);
+        action.addSubCat(
+            "${widget.data!.subCategoryId!.name!}|${widget.data!.subCategoryId!.id!}");
+        // seeError(
+        //     "${widget.data!.subCategoryId!.name!}|${widget.data!.subCategoryId!.id!}");
+      });
+      productNameEC = TextEditingController(text: widget.data!.name ?? "");
+      productDescriptionEC =
+          TextEditingController(text: widget.data!.description ?? "");
+      productPriceEC = TextEditingController(
+          text:
+              widget.data!.price != null ? widget.data!.price.toString() : "");
+      productQuantityEC = TextEditingController(
+          text: widget.data!.quantityAvailable != null
+              ? widget.data!.quantityAvailable.toString()
+              : "");
+      productCategoryEC = TextEditingController(
+          text: widget.data!.subCategoryId != null
+              ? widget.data!.subCategoryId!.name!
+              : "");
+      productDiscountEC = TextEditingController(text: "");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    ExtraProvider stream = context.watch<ExtraProvider>();
+    SendProductProvider send = context.watch<SendProductProvider>();
+    CategoryProvider cat = context.watch<CategoryProvider>();
+    var txt = {
+      "dropDown": ["Select"],
+    };
+
+    cat.subCategory.forEach((element) {
+      if (txt["dropDown"]!.contains("${element.name!}|${element.id}")) {
+      } else {
+        txt["dropDown"]!.add("${element.name!}|${element.id}");
+      }
+    });
     return GestureDetector(
       onTap: (() => FocusManager.instance.primaryFocus?.unfocus()),
       child: Scaffold(
         backgroundColor: kPrimaryColor,
         appBar: MyAppBar(
-          title: "Add New Item ",
+          title: widget.isEdit == true ? "Update Item" : "Add New Item ",
           toolbarHeight: 80,
           backgroundColor: kPrimaryColor,
           elevation: 0.0,
@@ -92,45 +148,52 @@ class _AddProductState extends State<AddProduct> {
               scrollDirection: Axis.vertical,
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () => widget.isEdit == true
+                      ? null
+                      : Operations.addItemImage(context),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: 144,
                     decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(
-                          width: 0.50,
-                          color: Color(
-                            0xFFE6E6E6,
-                          ),
-                        ),
-                        borderRadius: BorderRadius.circular(
-                          16,
-                        ),
-                      ),
-                    ),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/icons/image-upload.png",
-                          ),
-                          kHalfSizedBox,
-                          const Text(
-                            'Upload product image',
-                            style: TextStyle(
-                              color: Color(
-                                0xFF808080,
-                              ),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(
+                            width: 0.50,
+                            color: Color(
+                              0xFFE6E6E6,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ),
+                        ),
+                        image: stream.addedItem == null
+                            ? null
+                            : DecorationImage(
+                                image: FileImage(stream.addedItem!))),
+                    child: stream.addedItem == null
+                        ? Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "assets/images/icons/image-upload.png",
+                                ),
+                                kHalfSizedBox,
+                                const Text(
+                                  'Upload product image',
+                                  style: TextStyle(
+                                    color: Color(
+                                      0xFF808080,
+                                    ),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : SizedBox.shrink(),
                   ),
                 ),
                 kSizedBox,
@@ -139,29 +202,42 @@ class _AddProductState extends State<AddProduct> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Product Type',
-                        style: TextStyle(
-                          color: Color(
-                            0xFF575757,
-                          ),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.32,
-                        ),
-                      ),
+                      widget.isEdit == true
+                          ? const SizedBox.shrink()
+                          : const Text(
+                              'Product Type',
+                              style: TextStyle(
+                                color: Color(
+                                  0xFF575757,
+                                ),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.32,
+                              ),
+                            ),
                       kHalfSizedBox,
-                      DropdownButtonFormField<String>(
-                        value: dropDownItemValue,
-                        onChanged: dropDownOnChanged,
+                      DropdownButtonFormField(
+                        value: cat.subCatSelected,
+                        onChanged: (value) {
+                          //   print(value.toString());
+                          CategoryProvider action =
+                              Provider.of(context, listen: false);
+                          List<String> selected = txt["dropDown"]!
+                              .where((element) =>
+                                  element.split("|").first == value)
+                              .toList();
+                          //  print(selected.first.toString());
+
+                          action.addSubCat(selected.first.toString());
+                        },
                         enableFeedback: true,
                         focusNode: productType,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         elevation: 20,
                         validator: (value) {
-                          if (value == null) {
+                          if (value == null || value.toString() == "Select") {
                             productType.requestFocus();
-                            return "Pick a Product Type";
+                            return error("Set product type");
                           }
                           return null;
                         },
@@ -208,56 +284,22 @@ class _AddProductState extends State<AddProduct> {
                         ),
                         iconEnabledColor: kAccentColor,
                         iconDisabledColor: kGreyColor2,
-                        items: const [
-                          DropdownMenuItem<String>(
-                            value: "Food",
-                            enabled: true,
-                            child: Text(
-                              'Food',
-                              style: TextStyle(
-                                color: kTextBlackColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                        items: txt["dropDown"]!
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.split("|").first,
+                                //  enabled: true,
+                                child: Text(
+                                  e.split("|").first,
+                                  style: const TextStyle(
+                                    color: kTextBlackColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: "Drinks",
-                            enabled: true,
-                            child: Text(
-                              'Drinks',
-                              style: TextStyle(
-                                color: kTextBlackColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: "Vegetables",
-                            enabled: true,
-                            child: Text(
-                              "Vegetables",
-                              style: TextStyle(
-                                color: kTextBlackColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          DropdownMenuItem<String>(
-                            value: "Meat",
-                            enabled: true,
-                            child: Text(
-                              "Meat",
-                              style: TextStyle(
-                                color: kTextBlackColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
+                            )
+                            .toList(),
                       ),
                       kSizedBox,
                       const Text(
@@ -429,9 +471,9 @@ class _AddProductState extends State<AddProduct> {
                           Icons.arrow_forward_ios_rounded,
                           color: kAccentColor,
                         ),
-                        title: const Text(
-                          'Select Category',
-                          style: TextStyle(
+                        title: Text(
+                          cat.name.split("|").first,
+                          style: const TextStyle(
                             color: Color(
                               0xFF979797,
                             ),
@@ -656,9 +698,15 @@ class _AddProductState extends State<AddProduct> {
                               ),
                             ),
                             onChanged: (newValue) {
-                              setState(() {
-                                isChecked3 = newValue!;
-                              });
+                              if (widget.isEdit == true) {
+                                setState(() {
+                                  isChecked3 = newValue!;
+                                });
+                              } else {
+                                inAppToast(context,
+                                    "you can only set item on product edit. kindly add this item first",
+                                    isError: true);
+                              }
                             },
                           ),
                           const Text(
@@ -681,7 +729,9 @@ class _AddProductState extends State<AddProduct> {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const SetVariety(),
+                                    builder: (context) => SetVariety(
+                                      data: widget.data,
+                                    ),
                                   ),
                                 );
                               },
@@ -749,17 +799,28 @@ class _AddProductState extends State<AddProduct> {
                               ),
                             ),
                       kSizedBox,
-                      MyElevatedButton(
-                        onPressed: () {},
-                        elevation: 10.0,
-                        buttonTitle: "Save",
-                        titleFontSize: 14,
-                        circularBorderRadius: 20,
-                        maximumSizeHeight: 56,
-                        maximumSizeWidth: MediaQuery.of(context).size.width,
-                        minimumSizeHeight: 56,
-                        minimumSizeWidth: MediaQuery.of(context).size.width,
-                      ),
+                      send.load || send.loadUpdate
+                          ? Loader()
+                          : MyElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  _saveInfo(context);
+                                  // print("validated");
+                                }
+                              },
+                              elevation: 10.0,
+                              buttonTitle:
+                                  widget.isEdit == true ? "Update" : "Save",
+                              titleFontSize: 14,
+                              circularBorderRadius: 20,
+                              maximumSizeHeight: 56,
+                              maximumSizeWidth:
+                                  MediaQuery.of(context).size.width,
+                              minimumSizeHeight: 56,
+                              minimumSizeWidth:
+                                  MediaQuery.of(context).size.width,
+                            ),
                     ],
                   ),
                 ),
@@ -769,5 +830,64 @@ class _AddProductState extends State<AddProduct> {
         ),
       ),
     );
+  }
+
+  _saveInfo(context) {
+    CategoryProvider cat = Provider.of(context, listen: false);
+    ExtraProvider extra = Provider.of(context, listen: false);
+    // log(widget.data!.id!);
+
+    if (widget.isEdit == true) {
+      if (cat.subCatSelected == "Select") {
+        productType.requestFocus();
+        error("Set product type");
+
+        return;
+      }
+
+      UploadProductController.updateProd(
+          context,
+          productNameEC.text,
+          productDescriptionEC.text,
+          productPriceEC.text,
+          productQuantityEC.text,
+          widget.data!.subCategoryId!.id,
+          widget.data!.id!);
+    } else {
+      if (extra.addedItem == null) {
+        error("Add product image");
+        return;
+      }
+      if (cat.subCatSelected == "Select") {
+        productType.requestFocus();
+        error("Set product type");
+
+        return;
+      }
+
+      if (productNameEC.text.isEmpty ||
+          productDescriptionEC.text.isEmpty ||
+          productPriceEC.text.isEmpty ||
+          productQuantityEC.text.isEmpty) {
+        error("incomplete form");
+        return;
+      }
+
+      if (cat.name == "Select Category") {
+        PageRouting.pushToPage(context, const SelectCategory());
+        return;
+      }
+
+      UploadProductController.sendProd(
+          context,
+          productNameEC.text,
+          productDescriptionEC.text,
+          productPriceEC.text,
+          productQuantityEC.text);
+    }
+  }
+
+  error(val) {
+    myFixedSnackBar(context, "$val", Colors.redAccent, Duration(seconds: 2));
   }
 }

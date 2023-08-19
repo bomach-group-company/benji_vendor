@@ -1,8 +1,13 @@
 import 'package:benji_vendor/app/others/user%20reviews.dart';
+import 'package:benji_vendor/back_office/order/order_provider.dart';
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/screens/login.dart';
+import 'package:benji_vendor/utility/operations.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/auth/auth_controller.dart';
+import '../../back_office/user/user_provider.dart';
 import '../../theme/colors.dart';
 import '../../widgets/profile/profile first half.dart';
 
@@ -16,6 +21,8 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
+    UserProvider user = context.watch<UserProvider>();
+    MyOrderProvider orders = context.watch<MyOrderProvider>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kAccentColor,
@@ -39,8 +46,11 @@ class _ProfileState extends State<Profile> {
         child: ListView(
           scrollDirection: Axis.vertical,
           children: [
-            const ProfileFirstHalf(
-              availableBalance: "100,000.00",
+            ProfileFirstHalf(
+              availableBalance: Operations.convertToCurrency(
+                  user.user.balance == null
+                      ? "0"
+                      : user.user.balance.toString()),
             ),
             Padding(
               padding: const EdgeInsets.only(
@@ -188,10 +198,11 @@ class _ProfileState extends State<Profile> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      trailing: const Text(
-                        '29K',
+                      trailing: Text(
+                        Operations.convertToCurrency(
+                            orders.myOrders.length.toString()),
                         textAlign: TextAlign.right,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(
                             0xFF9B9BA5,
                           ),
@@ -289,13 +300,39 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
                 child: ListTile(
-                  onTap: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => const Login(),
+                  onTap: () async {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)),
+                      elevation: 10.0,
+                      padding: const EdgeInsets.only(
+                          top: 10, bottom: 10, left: 15, right: 3),
+                      content: Row(
+                        children: [
+                          Container(
+                              constraints: BoxConstraints(maxWidth: 200),
+                              child: Text(
+                                "Sure you want to log out?",
+                              ))
+                        ],
                       ),
-                      (route) => false,
-                    );
+                      backgroundColor: kAccentColor.withOpacity(.6),
+                      action: SnackBarAction(
+                          label: "Yes",
+                          textColor: Colors.white,
+                          onPressed: () async {
+                            await AuthIndividualController.logOutUser(context);
+                          }),
+                    ));
+
+                    // Navigator.of(context).pushAndRemoveUntil(
+                    //   MaterialPageRoute(
+                    //     builder: (context) => const Login(),
+                    //   ),
+                    //   (route) => false,
+                    // );
                   },
                   leading: Icon(
                     Icons.logout_rounded,

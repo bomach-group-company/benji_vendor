@@ -1,11 +1,16 @@
 // ignore_for_file: file_names
 
+import 'package:benji_vendor/back_office/category/category_provider.dart';
 import 'package:benji_vendor/reusable%20widgets/my%20appbar.dart';
 import 'package:benji_vendor/theme/colors.dart';
+import 'package:benji_vendor/utility/allNavigation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/category/category_model.dart';
 import '../../providers/constants.dart';
 import '../../reusable widgets/my elevatedButton.dart';
+import '../../reusable widgets/my fixed snackBar.dart';
 import '../../reusable widgets/my textformfield2.dart';
 import '../../reusable widgets/showModalBottomSheetTitleWithIcon.dart';
 import '../others/successful_screen.dart';
@@ -47,8 +52,15 @@ class _SelectCategoryState extends State<SelectCategory> {
     selectedCategory = -1;
   }
 
+  error(val) {
+    myFixedSnackBar(context, "$val", Colors.redAccent, Duration(seconds: 2));
+  }
+
   @override
   Widget build(BuildContext context) {
+    CategoryProvider stream = context.watch<CategoryProvider>();
+    CategoryProvider action =
+        Provider.of<CategoryProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: kPrimaryColor,
       appBar: MyAppBar(
@@ -74,16 +86,18 @@ class _SelectCategoryState extends State<SelectCategory> {
               child: ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.vertical,
-                itemCount: categoryCount,
+                itemCount: stream.category.length,
                 itemBuilder: (BuildContext context, int index) {
+                  final CategoryModel data = stream.category[index];
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       InkWell(
                         onTap: () {
-                          setState(() {
-                            selectedCategory = index;
-                          });
+                          action.addCategory("${data.name}|${data.id}");
+                          // setState(() {
+                          //   selectedCategory = index;
+                          // });
                         },
                         child: SizedBox(
                           height: 50,
@@ -92,17 +106,18 @@ class _SelectCategoryState extends State<SelectCategory> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                categoryList[index],
+                                data.name!,
                                 style: TextStyle(
-                                  color: selectedCategory == index
-                                      ? kBlackColor
-                                      : kGreyColor1,
+                                  color:
+                                      stream.name.split("|").first == data.name
+                                          ? kBlackColor
+                                          : kGreyColor1,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               Icon(
-                                selectedCategory == index
+                                stream.name.split("|").first == data.name
                                     ? Icons.check_rounded
                                     : null,
                                 color: kAccentColor,
@@ -128,14 +143,15 @@ class _SelectCategoryState extends State<SelectCategory> {
             MyElevatedButton(
               buttonTitle: "Save",
               onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const SuccessfulScreen(
-                      text: "Product added successfully",
-                      elevatedButtonTitle: "Okay",
-                    ),
-                  ),
-                );
+                PageRouting.popToPage(context);
+                // Navigator.of(context).pushReplacement(
+                //   MaterialPageRoute(
+                //     builder: (context) => const SuccessfulScreen(
+                //       text: "Product added successfully",
+                //       elevatedButtonTitle: "Okay",
+                //     ),
+                //   ),
+                // );
               },
               circularBorderRadius: 16,
               minimumSizeWidth: MediaQuery.of(context).size.width,
@@ -148,100 +164,101 @@ class _SelectCategoryState extends State<SelectCategory> {
             kSizedBox,
             InkWell(
               onTap: () {
+                error("Not available at the moment");
                 // Navigator.of(context).push(
                 //   MaterialPageRoute(
                 //     builder: (context) => const AddCategory(),
                 //   ),
                 // );
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: kPrimaryColor,
-                  barrierColor: kBlackColor.withOpacity(0.5),
-                  showDragHandle: true,
-                  useSafeArea: true,
-                  isScrollControlled: true,
-                  isDismissible: true,
-                  elevation: 20.0,
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.7,
-                    minHeight: MediaQuery.of(context).size.height * 0.5,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(
-                        kDefaultPadding,
-                      ),
-                    ),
-                  ),
-                  enableDrag: true,
-                  builder: (context) => GestureDetector(
-                    onTap: (() =>
-                        FocusManager.instance.primaryFocus?.unfocus()),
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      padding: const EdgeInsets.only(
-                        left: kDefaultPadding,
-                        top: kDefaultPadding / 2,
-                        right: kDefaultPadding,
-                        bottom: kDefaultPadding,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const ShowModalBottomSheetTitleWithIcon(
-                            title: "Create Category",
-                          ),
-                          const SizedBox(height: kDefaultPadding * 4),
-                          MyTextFormField2(
-                            controller: categoryNameEC,
-                            focusNode: categoryNameFN,
-                            textInputType: TextInputType.name,
-                            hintText: "Enter category name here",
-                            textInputAction: TextInputAction.go,
-                            validator: (value) {
-                              RegExp namePattern = RegExp(
-                                r'^.{3,}$', //Less than 3 characters
-                              );
-                              if (value == null || value!.isEmpty) {
-                                categoryNameFN.requestFocus();
-                                return "Enter a category";
-                              } else if (!namePattern.hasMatch(value)) {
-                                categoryNameFN.requestFocus();
-                                return "Please enter a valid name";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              categoryNameEC.text = value;
-                            },
-                          ),
-                          kSizedBox,
-                          MyElevatedButton(
-                            buttonTitle: "Save",
-                            onPressed: () {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => const SuccessfulScreen(
-                                    text: "Product created successfully",
-                                    elevatedButtonTitle: "Okay",
-                                  ),
-                                ),
-                              );
-                            },
-                            circularBorderRadius: 16,
-                            minimumSizeWidth: MediaQuery.of(context).size.width,
-                            minimumSizeHeight: 50,
-                            maximumSizeWidth: MediaQuery.of(context).size.width,
-                            maximumSizeHeight: 50,
-                            titleFontSize: 14,
-                            elevation: 0,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+                // showModalBottomSheet(
+                //   context: context,
+                //   backgroundColor: kPrimaryColor,
+                //   barrierColor: kBlackColor.withOpacity(0.5),
+                //   showDragHandle: true,
+                //   useSafeArea: true,
+                //   isScrollControlled: true,
+                //   isDismissible: true,
+                //   elevation: 20.0,
+                //   constraints: BoxConstraints(
+                //     maxHeight: MediaQuery.of(context).size.height * 0.7,
+                //     minHeight: MediaQuery.of(context).size.height * 0.5,
+                //   ),
+                //   shape: const RoundedRectangleBorder(
+                //     borderRadius: BorderRadius.vertical(
+                //       top: Radius.circular(
+                //         kDefaultPadding,
+                //       ),
+                //     ),
+                //   ),
+                //   enableDrag: true,
+                //   builder: (context) => GestureDetector(
+                //     onTap: (() =>
+                //         FocusManager.instance.primaryFocus?.unfocus()),
+                //     child: SingleChildScrollView(
+                //       physics: const BouncingScrollPhysics(),
+                //       scrollDirection: Axis.vertical,
+                //       padding: const EdgeInsets.only(
+                //         left: kDefaultPadding,
+                //         top: kDefaultPadding / 2,
+                //         right: kDefaultPadding,
+                //         bottom: kDefaultPadding,
+                //       ),
+                //       child: Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           const ShowModalBottomSheetTitleWithIcon(
+                //             title: "Create Category",
+                //           ),
+                //           const SizedBox(height: kDefaultPadding * 4),
+                //           MyTextFormField2(
+                //             controller: categoryNameEC,
+                //             focusNode: categoryNameFN,
+                //             textInputType: TextInputType.name,
+                //             hintText: "Enter category name here",
+                //             textInputAction: TextInputAction.go,
+                //             validator: (value) {
+                //               RegExp namePattern = RegExp(
+                //                 r'^.{3,}$', //Less than 3 characters
+                //               );
+                //               if (value == null || value!.isEmpty) {
+                //                 categoryNameFN.requestFocus();
+                //                 return "Enter a category";
+                //               } else if (!namePattern.hasMatch(value)) {
+                //                 categoryNameFN.requestFocus();
+                //                 return "Please enter a valid name";
+                //               }
+                //               return null;
+                //             },
+                //             onSaved: (value) {
+                //               categoryNameEC.text = value;
+                //             },
+                //           ),
+                //           kSizedBox,
+                //           MyElevatedButton(
+                //             buttonTitle: "Save",
+                //             onPressed: () {
+                //               Navigator.of(context).pushReplacement(
+                //                 MaterialPageRoute(
+                //                   builder: (context) => const SuccessfulScreen(
+                //                     text: "Product created successfully",
+                //                     elevatedButtonTitle: "Okay",
+                //                   ),
+                //                 ),
+                //               );
+                //             },
+                //             circularBorderRadius: 16,
+                //             minimumSizeWidth: MediaQuery.of(context).size.width,
+                //             minimumSizeHeight: 50,
+                //             maximumSizeWidth: MediaQuery.of(context).size.width,
+                //             maximumSizeHeight: 50,
+                //             titleFontSize: 14,
+                //             elevation: 0,
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // );
               },
               borderRadius: BorderRadius.circular(16),
               child: Container(

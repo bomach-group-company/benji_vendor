@@ -1,16 +1,25 @@
 // ignore_for_file: file_names
 
+import 'package:benji_vendor/back_office/order/order_controller.dart';
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/reusable%20widgets/my%20appbar.dart';
+import 'package:benji_vendor/reusable%20widgets/toast.dart';
 import 'package:benji_vendor/theme/colors.dart';
+import 'package:benji_vendor/utility/operations.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/order/order_model.dart';
+import '../../back_office/order/order_provider.dart';
+import '../../back_office/url_launch_controller.dart';
 import '../../reusable widgets/my elevatedButton.dart';
 import '../../reusable widgets/my outlined elevatedButton.dart';
 
 class OrderDetails extends StatefulWidget {
-  const OrderDetails({super.key});
+  final MyOrderModel? order;
+  const OrderDetails({super.key, required this.order});
 
   @override
   State<OrderDetails> createState() => _OrderDetailsState();
@@ -59,6 +68,7 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   @override
   Widget build(BuildContext context) {
+    MyOrderProvider order = context.watch<MyOrderProvider>();
     return Scaffold(
       appBar: MyAppBar(
         title: "Order Details",
@@ -99,11 +109,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Oder ID',
+                        const Text(
+                          'Order ID',
                           style: TextStyle(
                             color: Color(0xFF808080),
                             fontSize: 11.62,
@@ -111,9 +121,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ),
                         ),
                         Text(
-                          'Today, 12:30pm',
+                          Operations.convertDate(widget.order!.created!),
                           textAlign: TextAlign.right,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Color(0xFF222222),
                             fontSize: 12.52,
                             fontWeight: FontWeight.w400,
@@ -125,17 +135,20 @@ class _OrderDetailsState extends State<OrderDetails> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          '#00977',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF222222),
-                            fontSize: 16.09,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.32,
+                        Container(
+                          constraints: BoxConstraints(maxWidth: 160),
+                          child: Text(
+                            '#${widget.order!.id.toString()}',
+                            textAlign: TextAlign.left,
+                            style: const TextStyle(
+                              color: Color(0xFF222222),
+                              fontSize: 16.09,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.32,
+                            ),
                           ),
                         ),
-                        isOrderCanceled
+                        widget.order!.status == "CANC"
                             ? Text(
                                 'Canceled',
                                 textAlign: TextAlign.right,
@@ -146,7 +159,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                   letterSpacing: -0.32,
                                 ),
                               )
-                            : isOrderAccepted
+                            : widget.order!.status == "COMP"
                                 ? const Text(
                                     'Accepted',
                                     textAlign: TextAlign.right,
@@ -157,7 +170,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                       letterSpacing: -0.32,
                                     ),
                                   )
-                                : isOrderProcessing
+                                : widget.order!.status == "COMP"
                                     ? Text(
                                         'Processing',
                                         textAlign: TextAlign.right,
@@ -223,18 +236,31 @@ class _OrderDetailsState extends State<OrderDetails> {
                         width: 56,
                         height: 56,
                         decoration: ShapeDecoration(
-                          image: const DecorationImage(
-                            image: AssetImage(
-                              "assets/images/food/jollof-rice-chicken-plantain.png",
-                            ),
-                            fit: BoxFit.fill,
-                          ),
+                          // image: const DecorationImage(
+                          //   image: AssetImage(
+                          //     "assets/images/food/jollof-rice-chicken-plantain.png",
+                          //   ),
+                          //   fit: BoxFit.fill,
+                          // ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.order!.productId!.productImage ?? "",
+                          fit: BoxFit.cover,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) => const Center(
+                                  child: CircularProgressIndicator(
+                            color: kRedColor,
+                          )),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                            color: kRedColor,
+                          ),
+                        ),
                       ),
-                      const SizedBox(
+                      SizedBox(
                         width: 182.38,
                         child: Text.rich(
                           maxLines: 3,
@@ -243,15 +269,15 @@ class _OrderDetailsState extends State<OrderDetails> {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: "Jollof Rice and Chicken",
-                                style: TextStyle(
+                                text: widget.order!.productId!.name ?? "",
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12.52,
                                   overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              TextSpan(
+                              const TextSpan(
                                 text: " ",
                                 style: TextStyle(
                                   color: Colors.black,
@@ -260,8 +286,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 ),
                               ),
                               TextSpan(
-                                text: "x 2",
-                                style: TextStyle(
+                                text: "x ${widget.order!.quantity}",
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12.52,
                                   fontWeight: FontWeight.w700,
@@ -271,10 +297,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ),
                         ),
                       ),
-                      const Text.rich(
+                      Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: '₦',
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -283,7 +309,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: ' ',
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -292,8 +318,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                             ),
                             TextSpan(
-                              text: '5,000',
-                              style: TextStyle(
+                              text: Operations.convertToCurrency(
+                                  widget.order!.productId!.price.toString()),
+                              style: const TextStyle(
                                 color: Color(0xFF222222),
                                 fontSize: 14.30,
                                 fontWeight: FontWeight.w400,
@@ -345,22 +372,36 @@ class _OrderDetailsState extends State<OrderDetails> {
                     children: [
                       CircleAvatar(
                         radius: 30,
+                        backgroundColor: Colors.transparent,
                         child: ClipOval(
-                          child: Image.asset(
-                            "assets/images/customer/blessing-elechi.png",
-                            fit: BoxFit.fill,
-                            height: 60,
-                            width: 60,
+                            child: CachedNetworkImage(
+                          imageUrl: widget.order!.clientId!.image ?? "",
+                          fit: BoxFit.cover,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) => const Center(
+                                  child: CircularProgressIndicator(
+                            color: kRedColor,
+                          )),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                            color: kRedColor,
                           ),
-                        ),
+                        )
+                            // Image.asset(
+                            //   "assets/images/customer/blessing-elechi.png",
+                            //   fit: BoxFit.fill,
+                            //   height: 60,
+                            //   width: 60,
+                            // ),
+                            ),
                       ),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Blessing Elechi',
+                            widget.order!.clientId!.username ?? "",
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 12.52,
                               fontWeight: FontWeight.w700,
@@ -368,15 +409,15 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ),
                           kHalfSizedBox,
                           Text(
-                            '09023348400',
-                            style: TextStyle(
+                            widget.order!.clientId!.email ?? "",
+                            style: const TextStyle(
                               color: Color(0xFF979797),
                               fontSize: 11.62,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
                           kSizedBox,
-                          Text(
+                          const Text(
                             'Delivery address',
                             style: TextStyle(
                               color: Color(0xFF979797),
@@ -388,10 +429,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                           SizedBox(
                             width: 155,
                             child: Text(
-                              '21 Kanna Street, GRA, Enugu',
+                              widget.order!.deliveryAddress ?? "",
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Color(0xFF222222),
                                 overflow: TextOverflow.ellipsis,
                                 fontSize: 12.52,
@@ -419,7 +460,18 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ],
                         ),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            if (widget.order!.clientId!.phone == null ||
+                                widget.order!.clientId!.phone!.isEmpty) {
+                              inAppToast(
+                                  context, "Can't initiate call at this time",
+                                  isError: true);
+                              return;
+                            }
+
+                            await UrlLaunchController.makePhoneCall(
+                                widget.order!.clientId!.phone!);
+                          },
                           icon: Icon(
                             Icons.phone_rounded,
                             color: kPrimaryColor,
@@ -450,10 +502,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                   )
                 ],
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Order Summary',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -467,7 +519,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Subtotal',
                         style: TextStyle(
                           color: Colors.black,
@@ -478,7 +530,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: "₦",
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -487,7 +539,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: ' ',
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -496,8 +548,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                             ),
                             TextSpan(
-                              text: '5,000',
-                              style: TextStyle(
+                              text: Operations.convertToCurrency(
+                                  widget.order!.productId!.price.toString()),
+                              style: const TextStyle(
                                 color: Color(0xFF222222),
                                 fontSize: 14.30,
                                 fontWeight: FontWeight.w400,
@@ -510,10 +563,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                     ],
                   ),
                   kHalfSizedBox,
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Delivery Fee',
                         style: TextStyle(
                           color: Colors.black,
@@ -524,7 +577,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: "₦",
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -533,7 +586,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: ' ',
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -542,8 +595,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                             ),
                             TextSpan(
-                              text: '300',
-                              style: TextStyle(
+                              text: "0",
+                              style: const TextStyle(
                                 color: Color(0xFF222222),
                                 fontSize: 14.30,
                                 fontWeight: FontWeight.w400,
@@ -559,7 +612,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Total',
                         style: TextStyle(
                           color: Colors.black,
@@ -570,7 +623,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: "₦",
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -579,7 +632,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: ' ',
                               style: TextStyle(
                                 color: Color(0xFF222222),
@@ -588,8 +641,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                             ),
                             TextSpan(
-                              text: '5,300',
-                              style: TextStyle(
+                              text: Operations.convertToCurrency(
+                                  widget.order!.productId!.price.toString()),
+                              style: const TextStyle(
                                 color: Color(0xFF222222),
                                 fontSize: 14.30,
                                 fontWeight: FontWeight.w700,
@@ -608,7 +662,7 @@ class _OrderDetailsState extends State<OrderDetails> {
             const SizedBox(
               height: kDefaultPadding * 2,
             ),
-            isOrderCanceled
+            widget.order!.status == "CANC"
                 ? Container(
                     width: MediaQuery.of(context).size.width,
                     padding: const EdgeInsets.all(15),
@@ -665,7 +719,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       ],
                     ),
                   )
-                : isOrderAccepted
+                : widget.order!.status == "COMP"
                     ? Container(
                         width: MediaQuery.of(context).size.width,
                         padding: const EdgeInsets.all(15),
@@ -723,7 +777,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ],
                         ),
                       )
-                    : isOrderProcessing
+                    : order.loadAccept || order.loadCancel || order.loadDecline
                         ? SpinKitChasingDots(
                             color: kAccentColor,
                             duration: const Duration(seconds: 2),
@@ -732,8 +786,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               MyOutlinedElevatedButton(
-                                onPressed: () {
-                                  processOrderCanceled();
+                                onPressed: () async {
+                                  //    processOrderCanceled();
+                                  MyOrderController.cancelOrder(
+                                      context, widget.order!.id);
                                 },
                                 buttonTitle: "Cancel Order",
                                 elevation: 10.0,
@@ -747,8 +803,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                                     MediaQuery.of(context).size.width / 2.5,
                               ),
                               MyElevatedButton(
-                                onPressed: () {
-                                  processOrderAccepted();
+                                onPressed: () async {
+                                  MyOrderController.acceptOrder(
+                                      context, widget.order!.id);
                                 },
                                 elevation: 10.0,
                                 buttonTitle: "Accept Order",

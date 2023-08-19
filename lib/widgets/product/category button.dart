@@ -1,6 +1,11 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../back_office/my_product/my_product_provider.dart';
+import '../../back_office/order/order_provider.dart';
+import '../../theme/colors.dart';
 
 class CategoryButton extends StatelessWidget {
   final Function() onPressed;
@@ -17,11 +22,19 @@ class CategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MyProductProvider stream = context.watch();
+    MyOrderProvider order = context.watch();
+
     return ElevatedButton(
       onPressed: onPressed,
       onLongPress: null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: bgColor,
+        backgroundColor:
+            title == stream.selectedItemCat || title == order.selectedItemCat
+                ? kAccentColor
+                : Color(
+                    0xFFF2F2F2,
+                  ),
         minimumSize: const Size(
           100,
           80,
@@ -38,7 +51,12 @@ class CategoryButton extends StatelessWidget {
         style: TextStyle(
           overflow: TextOverflow.ellipsis,
           fontSize: 14,
-          color: categoryFontColor,
+          color:
+              title == stream.selectedItemCat || title == order.selectedItemCat
+                  ? kPrimaryColor
+                  : Color(
+                      0xFF828282,
+                    ),
           fontWeight: FontWeight.w700,
         ),
       ),

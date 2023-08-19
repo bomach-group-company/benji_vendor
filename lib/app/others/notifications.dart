@@ -1,7 +1,12 @@
+import 'package:benji_vendor/back_office/notification/notification_provider.dart';
+import 'package:benji_vendor/reusable%20widgets/empty.dart';
 import 'package:benji_vendor/theme/colors.dart';
 import 'package:benji_vendor/providers/constants.dart';
+import 'package:benji_vendor/utility/operations.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/notification/notification_model.dart';
 import '../../reusable widgets/my appbar.dart';
 
 class Notifications extends StatefulWidget {
@@ -37,6 +42,7 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
+    NotificationProvider notify = context.watch<NotificationProvider>();
     return Scaffold(
       backgroundColor: kPrimaryColor,
       appBar: MyAppBar(
@@ -46,17 +52,18 @@ class _NotificationsState extends State<Notifications> {
         elevation: 0.0,
         actions: const [],
       ),
-      body: SafeArea(
+      body: notify.notification.isEmpty ?const EmptyPage(msg: "You don't have any notification!")  : SafeArea(
         maintainBottomViewPadding: true,
         child: Container(
           padding: const EdgeInsets.all(
             kDefaultPadding,
           ),
           child: ListView.builder(
-            itemCount: _notifications,
+            itemCount: notify.notification.length,
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
             itemBuilder: ((context, index) {
+              final NotificationModel data = notify.notification[index];
               return Column(
                 children: [
                   ListTile(
@@ -74,7 +81,7 @@ class _NotificationsState extends State<Notifications> {
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: "${_notificationTitle[index]} \n",
+                            text: "${data.client!.username} \n",
                             style: const TextStyle(
                               color: Color(0xFF32343E),
                               fontSize: 13,
@@ -82,7 +89,7 @@ class _NotificationsState extends State<Notifications> {
                             ),
                           ),
                           TextSpan(
-                            text: _notificationSubject[index],
+                            text: data.message,
                             style: const TextStyle(
                               color: Color(0xFF9B9BA5),
                               fontSize: 13,
@@ -93,7 +100,7 @@ class _NotificationsState extends State<Notifications> {
                       ),
                     ),
                     subtitle: Text(
-                      _notificationTime[index],
+                      Operations.convertDate(data.created!),
                       style: const TextStyle(
                         color: Color(0xFF9B9BA5),
                         fontSize: 10,

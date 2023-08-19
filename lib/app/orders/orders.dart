@@ -1,5 +1,10 @@
+import 'package:benji_vendor/back_office/order/order_provider.dart';
+import 'package:benji_vendor/utility/operations.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/order/order_model.dart';
+import '../../reusable widgets/empty.dart';
 import '../../widgets/orders/orders container.dart';
 import '../../widgets/product/category button section.dart';
 import '../../theme/colors.dart';
@@ -43,6 +48,7 @@ class _OrdersState extends State<Orders> {
 
   @override
   Widget build(BuildContext context) {
+    MyOrderProvider order = context.watch<MyOrderProvider>();
     return Scaffold(
       body: SafeArea(
         maintainBottomViewPadding: true,
@@ -64,43 +70,68 @@ class _OrdersState extends State<Orders> {
                 ),
               ),
               kSizedBox,
-              CategoryButtonSection(
-                category: _categoryButton,
-                categorybgColor: _categoryButtonBgColor,
-                categoryFontColor: _categoryButtonFontColor,
-              ),
+              order.myOrders.isEmpty
+                  ? const SizedBox.shrink()
+                  : CategoryButtonSection(
+                      category: _categoryButton,
+                      categorybgColor: _categoryButtonBgColor,
+                      categoryFontColor: _categoryButtonFontColor,
+                      isOrder: true,
+                    ),
               kSizedBox,
-              Flexible(
-                child: Scrollbar(
-                  thickness: 10,
-                  interactive: true,
-                  thumbVisibility: true,
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const OrderDetails(),
+              order.myOrders.isEmpty
+                  ? Center(child: EmptyPage(msg: "You have no orders yet!"))
+                  : StreamBuilder(
+                      stream: null,
+                      builder: (context, snapshot) {
+                        List<MyOrderModel> afterFilter = order.myOrders
+                            .where((element) => element.status!
+                                .toUpperCase()
+                                .contains(order.selectedItemCat == "All"
+                                    ? ""
+                                    : order.selectedItemCat.characters
+                                        .take(4)
+                                        .toString()
+                                        .toUpperCase()))
+                            .toList();
+                        return Flexible(
+                          child: Scrollbar(
+                            thickness: 10,
+                            interactive: true,
+                            thumbVisibility: true,
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              itemCount: afterFilter.length,
+                              itemBuilder: (context, index) {
+                                MyOrderModel data = afterFilter[index];
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            OrderDetails(order: data),
+                                      ),
+                                    );
+                                  },
+                                  child: OrderContainer(
+                                    orderNumber: "00977",
+                                    customerName: data.clientId!.username ?? "",
+                                    orderTimeStamp:
+                                        Operations.convertDate(data.created!),
+                                    orderName: data.productId!.name ?? "",
+                                    orderQuantity: data.quantity.toString(),
+                                    orderPrice: Operations.convertToCurrency(
+                                        data.productId!.price.toString()),
+                                    customerAddress: data.deliveryAddress!,
+                                    productImage: data.productId!.productImage,
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                        child: OrderContainer(
-                          orderNumber: "00977",
-                          customerName: "Blessing Elechi",
-                          orderTimeStamp: "04-06-2023 | 12:30pm",
-                          orderName: "Jollof Rice and Chicken with Plantain",
-                          orderQuantity: 2.toString(),
-                          orderPrice: "5,000",
-                          customerAddress: "21 Kanna Street, GRA, Enugu",
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
+                          ),
+                        );
+                      }),
             ],
           ),
         ),

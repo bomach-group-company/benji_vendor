@@ -1,8 +1,10 @@
 // ignore_for_file: file_names
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../providers/constants.dart';
+import '../../theme/colors.dart';
 
 class OrderContainer extends StatelessWidget {
   final String customerName;
@@ -12,6 +14,7 @@ class OrderContainer extends StatelessWidget {
   final String orderQuantity;
   final String orderPrice;
   final String customerAddress;
+  final String? productImage;
   const OrderContainer({
     super.key,
     required this.customerName,
@@ -21,6 +24,7 @@ class OrderContainer extends StatelessWidget {
     required this.orderQuantity,
     required this.orderPrice,
     required this.customerAddress,
+    required this.productImage,
   });
 
   @override
@@ -53,14 +57,27 @@ class OrderContainer extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: ShapeDecoration(
-                  image: const DecorationImage(
-                    image: AssetImage(
-                      "assets/images/food/jollof-rice-chicken-plantain.png",
-                    ),
-                    fit: BoxFit.fill,
-                  ),
+                  // image: const DecorationImage(
+                  //   image: AssetImage(
+                  //     "assets/images/food/jollof-rice-chicken-plantain.png",
+                  //   ),
+                  //   fit: BoxFit.fill,
+                  // ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: productImage ?? "",
+                  fit: BoxFit.cover,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      const Center(
+                          child: CircularProgressIndicator(
+                    color: kRedColor,
+                  )),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.error,
+                    color: kRedColor,
                   ),
                 ),
               ),
@@ -171,12 +188,15 @@ class OrderContainer extends StatelessWidget {
                 ],
               ),
               kHalfSizedBox,
-              Text(
-                customerAddress,
-                style: const TextStyle(
-                  color: Color(0xFFA6A6A6),
-                  fontSize: 12.52,
-                  fontWeight: FontWeight.w400,
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                child: Text(
+                  customerAddress,
+                  style: const TextStyle(
+                    color: Color(0xFFA6A6A6),
+                    fontSize: 12.52,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               )
             ],

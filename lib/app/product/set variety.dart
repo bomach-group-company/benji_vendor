@@ -1,17 +1,25 @@
 // ignore_for_file: file_names
 
+import 'package:benji_vendor/back_office/upload_product/upload_prod_controller.dart';
+import 'package:benji_vendor/back_office/upload_product/upload_prod_model.dart';
+import 'package:benji_vendor/reusable%20widgets/loader.dart';
 import 'package:flutter/material.dart';
 
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/reusable%20widgets/my%20outlined%20elevatedButton.dart';
 import 'package:benji_vendor/theme/colors.dart';
+import 'package:provider/provider.dart';
 
+import '../../back_office/my_product/my_product_model.dart';
+import '../../back_office/upload_product/upload_prod_provider.dart';
 import '../../reusable widgets/my appbar.dart';
 import '../../reusable widgets/my elevatedButton.dart';
 import '../../reusable widgets/my textformfield2.dart';
+import '../../reusable widgets/toast.dart';
 
 class SetVariety extends StatefulWidget {
-  const SetVariety({super.key});
+  final MyProductsModel? data;
+  const SetVariety({super.key, this.data});
 
   @override
   State<SetVariety> createState() => _SetVarietyState();
@@ -36,6 +44,7 @@ class _SetVarietyState extends State<SetVariety> {
 
   @override
   Widget build(BuildContext context) {
+    SendProductProvider stream = context.watch<SendProductProvider>();
     return Scaffold(
       backgroundColor: kPrimaryColor,
       appBar: MyAppBar(
@@ -106,7 +115,7 @@ class _SetVarietyState extends State<SetVariety> {
                               MyTextFormField2(
                                 hintText: "Enter an option",
                                 textInputType: TextInputType.name,
-                                controller: titleEC,
+                                controller: optionEC,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     optionFN.requestFocus();
@@ -181,21 +190,35 @@ class _SetVarietyState extends State<SetVariety> {
               const SizedBox(
                 height: kDefaultPadding * 4,
               ),
-              MyElevatedButton(
-                onPressed: () {},
-                circularBorderRadius: 20,
-                minimumSizeWidth: MediaQuery.of(context).size.width,
-                minimumSizeHeight: 50,
-                maximumSizeWidth: MediaQuery.of(context).size.width,
-                maximumSizeHeight: 50,
-                buttonTitle: "Set Variety",
-                titleFontSize: 14,
-                elevation: 0.0,
-              ),
+              stream.loadV
+                  ? Loader()
+                  : MyElevatedButton(
+                      onPressed: () {
+                        save(context);
+                      },
+                      circularBorderRadius: 20,
+                      minimumSizeWidth: MediaQuery.of(context).size.width,
+                      minimumSizeHeight: 50,
+                      maximumSizeWidth: MediaQuery.of(context).size.width,
+                      maximumSizeHeight: 50,
+                      buttonTitle: "Set Variety",
+                      titleFontSize: 14,
+                      elevation: 0.0,
+                    ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  save(context) async {
+    if (titleEC.text.isEmpty) {
+      inAppSnackBar(context, "Add title", true);
+      return;
+    } else {
+      UploadProductController.updateVariety(
+          context, titleEC.text, widget.data!.id);
+    }
   }
 }

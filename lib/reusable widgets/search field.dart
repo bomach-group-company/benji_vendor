@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 import '../theme/colors.dart';
 
 class SearchField extends StatelessWidget {
-  const SearchField({
+  SearchField({
     super.key,
     required this.searchController,
     required this.hintText,
+    required this.change
   });
 
   final String hintText;
-  final TextEditingController searchController;
+  TextEditingController searchController;
+  Function(String) change;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,7 @@ class SearchField extends StatelessWidget {
       autocorrect: true,
       canRequestFocus: true,
       cursorColor: kSecondaryColor,
+      onChanged: change,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(

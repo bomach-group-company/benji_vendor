@@ -4,8 +4,10 @@ import 'package:benji_vendor/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+import '../back_office/auth/auth_controller.dart';
 import '../providers/constants.dart';
 import '../theme/colors.dart';
+import '../utility/operations.dart';
 
 class StartupSplashscreen extends StatefulWidget {
   static String routeName = "Startup Splash Screen";
@@ -16,18 +18,37 @@ class StartupSplashscreen extends StatefulWidget {
 }
 
 class _StartupSplashscreenState extends State<StartupSplashscreen> {
+  static Future delayScreen(BuildContext context) async {
+    bool isFirstCheck = await Operations.isFirstTimeOnApp();
+    bool isLoggedInBefore = await Operations.isLoggedIn();
+    if (isLoggedInBefore) {
+      // ignore: use_build_context_synchronously
+      AuthIndividualController.loginUser(context, true);
+    } else {
+      // ignore: use_build_context_synchronously
+      Operations.delayScreen(
+          context, isFirstCheck ? const Login() : const Login());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    delayScreen(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future.delayed(
-        const Duration(
-          seconds: 4,
-        ), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (ctx) => const Login(),
-        ),
-      );
-    });
+    // Future.delayed(
+    //     const Duration(
+    //       seconds: 4,
+    //     ), () {
+    //   Navigator.of(context).pushReplacement(
+    //     MaterialPageRoute(
+    //       builder: (ctx) => const Login(),
+    //     ),
+    //   );
+    // });
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(kDefaultPadding / 2),

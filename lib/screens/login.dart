@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
+import 'package:benji_vendor/back_office/auth/auth_controller.dart';
+import 'package:benji_vendor/back_office/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/constants.dart';
 import '../reusable widgets/email textformfield.dart';
@@ -86,6 +89,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider stream = context.watch<AuthProvider>();
     return GestureDetector(
       onTap: (() => FocusManager.instance.primaryFocus?.unfocus()),
       child: Scaffold(
@@ -273,7 +277,7 @@ class _LoginState extends State<Login> {
                         ],
                       ),
                       kSizedBox,
-                      isLoading
+                      stream.loadLogin
                           ? Center(
                               child: SpinKitChasingDots(
                                 color: kAccentColor,
@@ -283,7 +287,11 @@ class _LoginState extends State<Login> {
                           : ElevatedButton(
                               onPressed: (() async {
                                 if (_formKey.currentState!.validate()) {
-                                  loadData();
+                                  AuthIndividualController.saveLoginInfo(
+                                      context,
+                                      emailController.text,
+                                      passwordController.text);
+                                  //loadData();
                                 }
                               }),
                               style: ElevatedButton.styleFrom(
