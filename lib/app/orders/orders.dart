@@ -3,12 +3,17 @@ import 'package:benji_vendor/utility/operations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/order/order_model.dart';
 import '../../reusable widgets/empty.dart';
 import '../../widgets/orders/orders container.dart';
 import '../../widgets/product/category button section.dart';
+=======
+import '../../src/common_widgets/category button section.dart';
+import '../../src/common_widgets/orders container.dart';
+import '../../src/providers/constants.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import '../../theme/colors.dart';
-import '../../providers/constants.dart';
 import 'order details.dart';
 
 class Orders extends StatefulWidget {

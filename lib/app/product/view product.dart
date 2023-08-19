@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/category/category_provider.dart';
 import '../../back_office/my_product/my_product_controller.dart';
 import '../../back_office/my_product/my_product_model.dart';
@@ -20,6 +21,13 @@ import '../../reusable widgets/showModalBottomSheetTitleWithIcon.dart';
 import '../../theme/colors.dart';
 import '../../widgets/product/category button section.dart';
 import 'add new product.dart';
+=======
+import '../../src/common_widgets/category button section.dart';
+import '../../src/common_widgets/showModalBottomSheet.dart';
+import '../../src/common_widgets/showModalBottomSheetTitleWithIcon.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 
 class ViewProduct extends StatefulWidget {
   final MyProductsModel product;

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers
 
+<<<<<<< HEAD
 import 'package:benji_vendor/back_office/category/category_controller.dart';
 import 'package:benji_vendor/back_office/my_product/my_product_controller.dart';
 import 'package:benji_vendor/back_office/order/order_provider.dart';
@@ -9,9 +10,13 @@ import 'package:benji_vendor/theme/colors.dart';
 import 'package:benji_vendor/utility/operations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
+=======
+import 'package:benji_vendor/app/others/user%20reviews.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/my_product/my_product_model.dart';
 import '../../back_office/my_product/my_product_provider.dart';
 import '../../back_office/ratings/rating_provider.dart';
@@ -20,6 +25,13 @@ import '../../reusable widgets/empty.dart';
 import '../../widgets/home/home appBar vendor name.dart';
 import '../../widgets/home/home orders container.dart';
 import '../../widgets/home/home showModalBottomSheet.dart';
+=======
+import '../../src/common_widgets/home appBar vendor name.dart';
+import '../../src/common_widgets/home orders container.dart';
+import '../../src/common_widgets/home showModalBottomSheet.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import '../others/notifications.dart';
 import '../others/user reviews.dart';
 import '../product/add new product.dart';
@@ -329,11 +341,48 @@ class _DashboardState extends State<Dashboard> {
                         ],
                       ),
                     ),
+<<<<<<< HEAD
                     kHalfWidthSizedBox,
                     Container(
                       child: TextButton(
                         onPressed: () {},
                         onLongPress: null,
+=======
+                  ),
+                ],
+              ),
+            ),
+            kSizedBox,
+            Container(
+              margin: const EdgeInsets.only(
+                left: kDefaultPadding,
+                right: kDefaultPadding,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        height: 16.57,
+                        child: Text(
+                          'Reviews',
+                          style: TextStyle(
+                            color: kTextGreyColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const UserReviews(),
+                            ),
+                          );
+                        },
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
                         child: Text(
                           'See Details',
                           textAlign: TextAlign.right,

@@ -1,15 +1,23 @@
 import 'package:benji_vendor/app/others/user%20reviews.dart';
+<<<<<<< HEAD
 import 'package:benji_vendor/back_office/order/order_provider.dart';
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/screens/login.dart';
 import 'package:benji_vendor/utility/operations.dart';
+=======
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/auth/auth_controller.dart';
 import '../../back_office/user/user_provider.dart';
+=======
+import '../../src/common_widgets/profile first half.dart';
+import '../../src/providers/constants.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import '../../theme/colors.dart';
-import '../../widgets/profile/profile first half.dart';
+import '../screens/login.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -61,7 +69,7 @@ class _ProfileState extends State<Profile> {
               ),
               child: Container(
                 width: 327,
-                height: 141,
+                height: 190,
                 padding: const EdgeInsets.all(
                   kDefaultPadding / 2,
                 ),
@@ -96,6 +104,26 @@ class _ProfileState extends State<Profile> {
                       ),
                       title: const Text(
                         'Personal Info',
+                        style: TextStyle(
+                          color: Color(
+                            0xFF333333,
+                          ),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      leading: Icon(
+                        Icons.business_rounded,
+                        color: kAccentColor,
+                      ),
+                      title: const Text(
+                        'Shop Info',
                         style: TextStyle(
                           color: Color(
                             0xFF333333,

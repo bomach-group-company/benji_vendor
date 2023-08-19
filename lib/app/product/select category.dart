@@ -1,18 +1,30 @@
 // ignore_for_file: file_names
 
+<<<<<<< HEAD
 import 'package:benji_vendor/back_office/category/category_provider.dart';
 import 'package:benji_vendor/reusable%20widgets/my%20appbar.dart';
 import 'package:benji_vendor/theme/colors.dart';
 import 'package:benji_vendor/utility/allNavigation.dart';
+=======
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/category/category_model.dart';
 import '../../providers/constants.dart';
 import '../../reusable widgets/my elevatedButton.dart';
 import '../../reusable widgets/my fixed snackBar.dart';
 import '../../reusable widgets/my textformfield2.dart';
 import '../../reusable widgets/showModalBottomSheetTitleWithIcon.dart';
+=======
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my textformfield2.dart';
+import '../../src/common_widgets/showModalBottomSheetTitleWithIcon.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import '../others/successful_screen.dart';
 
 class SelectCategory extends StatefulWidget {

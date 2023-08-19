@@ -5,6 +5,7 @@ import 'package:benji_vendor/back_office/upload_product/upload_prod_model.dart';
 import 'package:benji_vendor/reusable%20widgets/loader.dart';
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/reusable%20widgets/my%20outlined%20elevatedButton.dart';
 import 'package:benji_vendor/theme/colors.dart';
@@ -16,6 +17,14 @@ import '../../reusable widgets/my appbar.dart';
 import '../../reusable widgets/my elevatedButton.dart';
 import '../../reusable widgets/my textformfield2.dart';
 import '../../reusable widgets/toast.dart';
+=======
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my outlined elevatedButton.dart';
+import '../../src/common_widgets/my textformfield2.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 
 class SetVariety extends StatefulWidget {
   final MyProductsModel? data;

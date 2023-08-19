@@ -1,26 +1,29 @@
 import 'package:benji_vendor/utility/provider_init.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+<<<<<<< HEAD
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'routes/routes.dart';
 import 'splash screens/startup splash screen.dart';
+=======
+import 'package:get/get.dart';
+
+import 'src/splash screens/startup splash screen.dart';
+import 'theme/app theme.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import 'theme/colors.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-    ),
+    const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
   WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitUp],
   );
-  runApp(
-    const MyApp(),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return MultiProvider(
         providers: InitProvider.providerInit(),
       child: MaterialApp(
@@ -54,6 +58,16 @@ class MyApp extends StatelessWidget {
         // home: const OverView(),
         routes: routes,
       ),
+=======
+    return GetMaterialApp(
+      title: "Benji Vendor",
+      color: kPrimaryColor,
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      home: const StartupSplashscreen(),
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
     );
   }
 }

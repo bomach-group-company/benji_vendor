@@ -1,13 +1,22 @@
+<<<<<<< HEAD
 import 'package:benji_vendor/back_office/notification/notification_provider.dart';
 import 'package:benji_vendor/reusable%20widgets/empty.dart';
 import 'package:benji_vendor/theme/colors.dart';
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/utility/operations.dart';
+=======
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/notification/notification_model.dart';
 import '../../reusable widgets/my appbar.dart';
+=======
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});

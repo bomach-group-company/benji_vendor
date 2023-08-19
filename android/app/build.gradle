@@ -26,9 +26,15 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+<<<<<<< HEAD
     namespace "com.example.benji_vendor"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+=======
+    namespace "com.benji.benji_vendor"
+    compileSdk 34
+    ndkVersion '25.2.9519653'
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -45,7 +51,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.benji_vendor"
+        applicationId "com.benji.benji_vendor"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 20

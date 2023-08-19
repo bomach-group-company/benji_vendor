@@ -1,5 +1,6 @@
 // ignore_for_file: file_names, prefer_typing_uninitialized_variables
 
+<<<<<<< HEAD
 import 'dart:developer';
 
 import 'package:benji_vendor/back_office/category/category_provider.dart';
@@ -21,6 +22,19 @@ import '../../reusable widgets/my elevatedButton.dart';
 import '../../reusable widgets/my fixed snackBar.dart';
 import '../../reusable widgets/my outlined elevatedButton.dart';
 import '../../reusable widgets/my textformfield.dart';
+=======
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/common_widgets/my disabled outlined elevatedButton.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my outlined elevatedButton.dart';
+import '../../src/common_widgets/my textformfield.dart';
+import '../../src/providers/constants.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import '../../theme/colors.dart';
 import '../../utility/extras_provider.dart';
 import 'select category.dart';
@@ -77,6 +91,130 @@ class _AddProductState extends State<AddProduct> {
 
   int? selectedCategory;
 
+  //=========================== IMAGE PICKER ====================================\\
+
+  final ImagePicker _picker = ImagePicker();
+  File? selectedImage;
+
+  //================================== FUNCTIONS ====================================\\
+  pickProductImage(ImageSource source) async {
+    final XFile? image = await _picker.pickImage(
+      source: source,
+    );
+    if (image != null) {
+      selectedImage = File(image.path);
+      setState(() {});
+    }
+  }
+
+  //=========================== WIDGETS ====================================\\
+  Widget uploadProductImage() {
+    return Container(
+      height: 140,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.only(
+        left: kDefaultPadding,
+        right: kDefaultPadding,
+        bottom: kDefaultPadding,
+      ),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Upload Product Image",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              InkWell(
+                borderRadius: BorderRadius.circular(80),
+                onTap: () {},
+                child: Icon(
+                  Icons.delete_rounded,
+                  color: kAccentColor,
+                ),
+              ),
+            ],
+          ),
+          kSizedBox,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      pickProductImage(ImageSource.camera);
+                    },
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                          side: const BorderSide(
+                            width: 0.5,
+                            color: kGreyColor1,
+                          ),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.camera_alt_rounded,
+                        color: kAccentColor,
+                      ),
+                    ),
+                  ),
+                  kHalfSizedBox,
+                  const Text(
+                    "Camera",
+                  ),
+                ],
+              ),
+              kWidthSizedBox,
+              Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      pickProductImage(ImageSource.gallery);
+                    },
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                          side: const BorderSide(
+                            width: 0.5,
+                            color: kGreyColor1,
+                          ),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.image,
+                        color: kAccentColor,
+                      ),
+                    ),
+                  ),
+                  kHalfSizedBox,
+                  const Text(
+                    "Gallery",
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  //OVERRIDES
   @override
   void initState() {
     super.initState();
@@ -148,13 +286,41 @@ class _AddProductState extends State<AddProduct> {
               scrollDirection: Axis.vertical,
               children: [
                 InkWell(
+<<<<<<< HEAD
                   onTap: () => widget.isEdit == true
                       ? null
                       : Operations.addItemImage(context),
+=======
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      elevation: 20,
+                      barrierColor: kBlackColor.withOpacity(
+                        0.8,
+                      ),
+                      showDragHandle: true,
+                      useSafeArea: true,
+                      isDismissible: true,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(
+                            kDefaultPadding,
+                          ),
+                        ),
+                      ),
+                      enableDrag: true,
+                      builder: ((builder) => uploadProductImage()),
+                    );
+                  },
+                  splashColor: kAccentColor.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: 144,
                     decoration: ShapeDecoration(
+<<<<<<< HEAD
                         shape: RoundedRectangleBorder(
                           side: const BorderSide(
                             width: 0.50,
@@ -174,6 +340,20 @@ class _AddProductState extends State<AddProduct> {
                         ? Align(
                             alignment: Alignment.center,
                             child: Column(
+=======
+                      shape: RoundedRectangleBorder(
+                        side: const BorderSide(
+                          width: 0.50,
+                          color: Color(0xFFE6E6E6),
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: selectedImage == null
+                          ? Column(
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Image.asset(
@@ -191,9 +371,23 @@ class _AddProductState extends State<AddProduct> {
                                   ),
                                 ),
                               ],
+<<<<<<< HEAD
                             ),
                           )
                         : SizedBox.shrink(),
+=======
+                            )
+                          : GridTile(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: FileImage(selectedImage!),
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
                   ),
                 ),
                 kSizedBox,

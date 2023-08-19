@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+<<<<<<< HEAD
 import 'package:benji_vendor/back_office/order/order_controller.dart';
 import 'package:benji_vendor/providers/constants.dart';
 import 'package:benji_vendor/reusable%20widgets/my%20appbar.dart';
@@ -7,15 +8,25 @@ import 'package:benji_vendor/reusable%20widgets/toast.dart';
 import 'package:benji_vendor/theme/colors.dart';
 import 'package:benji_vendor/utility/operations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+=======
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< HEAD
 import '../../back_office/order/order_model.dart';
 import '../../back_office/order/order_provider.dart';
 import '../../back_office/url_launch_controller.dart';
 import '../../reusable widgets/my elevatedButton.dart';
 import '../../reusable widgets/my outlined elevatedButton.dart';
+=======
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/common_widgets/my elevatedButton.dart';
+import '../../src/common_widgets/my outlined elevatedButton.dart';
+import '../../src/providers/constants.dart';
+import '../../theme/colors.dart';
+>>>>>>> 2bb7c5da8b76930a1131e8b80be36410a7739dcd
 
 class OrderDetails extends StatefulWidget {
   final MyOrderModel? order;

@@ -7,9 +7,9 @@ import 'package:benji_vendor/utility/operations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../reusable widgets/my appbar.dart';
+import '../../src/common_widgets/my appbar.dart';
+import '../../src/providers/constants.dart';
 import '../../theme/colors.dart';
-import '../../providers/constants.dart';
 
 class UserReviews extends StatefulWidget {
   const UserReviews({super.key});
